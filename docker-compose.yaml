@@ -1,0 +1,32 @@
+version: '3.8'
+
+volumes:
+  tempgenshindb:
+
+services:
+  bot:
+    build: ./bot
+    volumes:
+      - ./bot:/usr/src/bot:rw
+    tty: true
+    depends_on:
+      - db
+    command: ["python3", "main.py"]
+    restart: always
+
+  db:
+    image: postgres:15.2-alpine3.17
+    volumes:
+      - ./db:/var/lib/postgresql/data
+      - ./init/db:/docker-entrypoint-initdb.d
+    ports:
+      - 5353:5432
+    environment:
+      - POSTGRES_PASSWORD=${SQL}
+      - POSTGRES_USER=${USER}
+      - POSTGRES_DB=${DNAME}
+      - TZ=Asia/Tokyo
+    # command: >
+    #   --character-set-server=utf8mb4
+    #   --collation-server=utf8mb4_general_ci
+    restart: always
