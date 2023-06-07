@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   bot:
@@ -21,20 +21,24 @@ services:
       - db
     command: ["python3", "main.py"]
     restart: always
+    networks:
+      - default
 
   db:
     image: postgres:15.2-alpine3.17
+    hostname: ${DBHOSTNAME}
     volumes:
       - ./db:/var/lib/postgresql/data
       - ./init/db:/docker-entrypoint-initdb.d
-    ports:
-      - ${LOCAL_DB_PORT}:${PORT}
     environment:
       - TZ=Asia/Tokyo
     env_file:
       - db.env
     restart: always
-    
+    networks:
+      - default
+      - genshin_network
+
   redis:
     image: redis:alpine
     volumes:
@@ -42,17 +46,28 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.50'
+          cpus: "0.50"
           memory: 128M
         reservations:
-          cpus: '0.25'
+          cpus: "0.25"
           memory: 20M
+    networks:
+      - default
 
-  rediscommander:
-    image: rediscommander/redis-commander:latest
-    ports:
-      - 18081:8081
-    depends_on:
-      - redis
+  redis-commander:
+    hostname: redis-commander
+    container_name: redis-commander
+    image: rediscommander/redis-commander
+    networks:
+      - default
+      - genshin_network
+    restart: always
     environment:
       - REDIS_HOSTS=local:redis:6379
+      - PORT=80
+
+networks:
+  default:
+  genshin_network:
+    external:
+      name: ${GENSHINDB}
