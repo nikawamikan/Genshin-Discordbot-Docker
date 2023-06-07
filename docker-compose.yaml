@@ -55,8 +55,8 @@ services:
       - default
 
   redis-commander:
-    hostname: redis-commander
-    container_name: redis-commander
+    hostname: ${REDIS}redis
+    container_name: ${REDIS}commander
     image: rediscommander/redis-commander
     networks:
       - default
@@ -65,7 +65,6 @@ services:
     environment:
       - REDIS_HOSTS=local:redis:6379
       - PORT=80
-
 networks:
   default:
   genshin_network:
