@@ -1,0 +1,4 @@
+{
+    // pylanceでの型チェックを強めにする
+    "python.analysis.typeCheckingMode": "basic"
+}
